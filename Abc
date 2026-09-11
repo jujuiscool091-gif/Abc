@@ -2,10 +2,10 @@
 // ULTIMATE TITAN ONE ADVANCED SCRIPT (XBOX SERIES X)
 // ==========================================
 // Menu Modifiers (Hold Left Bumper / LB to access):
-// - LB + XBOX/VIEW : Toggle Rapid Fire
-// - LB + MENU      : Toggle Anti-Recoil
-// - LB + A         : Toggle Drop-Shot
-// - LB + B         : Toggle Auto-Sprint
+// - LB + VIEW     : Toggle Rapid Fire
+// - LB + MENU     : Toggle Anti-Recoil
+// - LB + A        : Toggle Drop-Shot
+// - LB + B        : Toggle Auto-Sprint
 // ==========================================
 
 int rapid_fire    = FALSE;
@@ -41,8 +41,7 @@ main {
 
     // --- ANTI-RECOIL MODULE ---
     if (anti_recoil && get_val(XB1_RT)) {
-        // Compensates for weapon kick by pushing down the right stick
-        set_val(XB1_RY, clamp(get_val(XB1_RY) + recoil_strength, -100, 100));
+        set_val(XB1_RY, get_val(XB1_RY) + recoil_strength);
     }
 
     // --- DROP SHOT MODULE ---
@@ -64,7 +63,7 @@ combo RapidFire_Seq {
     wait(fire_delay);
 }
 
-// Drop Shot Loop (Drops to prone/crouch instantly on fire)
+// Drop Shot Loop
 combo DropShot_Seq {
     set_val(XB1_B, 100);
     wait(60);
