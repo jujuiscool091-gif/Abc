@@ -1,14 +1,21 @@
 // ==========================================
-// CALL OF DUTY - MEGA-MOD ULTIMATE SCRIPT (XBOX SERIES X)
+// CALL OF DUTY - ALL D-PAD MASTER SCRIPT (SLOT 2)
 // ==========================================
-// Menu Control (Hold Left Bumper / LB to modify):
-// - LB + VIEW     : Toggle Rapid Fire
-// - LB + MENU     : Toggle Anti-Recoil (Zero Vertical Rise)
-// - LB + X        : Toggle Slide-Cancel (CoD Movement)
-// - LB + A        : Toggle Drop-Shot
-// - LB + B        : Toggle Auto-Sprint / Tactical Sprint
-// - LB + Y        : Toggle Hair Triggers (Instant Response)
-// - LB + UP       : Toggle Strafe-Shot (Jitter/Strafing)
+// Direct D-Pad Toggles:
+// - D-PAD UP          : Rapid Fire
+// - D-PAD DOWN        : Anti-Recoil (Zero Vertical Rise)
+// - D-PAD LEFT        : Slide-Cancel
+// - D-PAD RIGHT       : Drop-Shot
+// - UP + DOWN         : Auto-Sprint
+// - UP + LEFT         : Hair Triggers
+// - UP + RIGHT        : Bunny Hop (Jump Spam)
+// - DOWN + LEFT       : Crouch Spam on Hit
+// - DOWN + RIGHT      : Quick Scope
+// - LEFT + RIGHT      : Fast Melee
+// - UP + DOWN + LEFT  : Auto-Hold Breath
+// - UP + DOWN + RIGHT : Auto-Ping Enemy
+// - UP + LEFT + RIGHT : Fast Reload
+// - DOWN + LEFT + RIGHT: Safe Drop
 // ==========================================
 
 int rapid_fire    = FALSE; 
@@ -17,124 +24,68 @@ int slide_cancel  = TRUE;
 int drop_shot     = FALSE; 
 int auto_sprint   = TRUE;  
 int hair_triggers = TRUE;  
-int strafe_shot   = FALSE; 
+int bunny_hop     = FALSE; 
+int crouch_spam   = FALSE; 
+int quick_scope   = FALSE; 
+int fast_melee    = FALSE; 
+int hold_breath   = TRUE;  
+int auto_ping     = TRUE;  
+int fast_reload   = FALSE; 
+int safe_drop     = TRUE;  
 
 // Advanced Tuning Parameters
-int recoil_strength = 50;  // Heavy vertical compensation strength
-int fire_delay      = 22;  // Milliseconds between rapid shots
+int recoil_strength = 50;  
+int fire_delay      = 22;  
 
 main {
-    // --- LIVE MENU TOGGLES (Hold LB / L1) ---
-    if (get_val(XB1_LB)) {
-        if (event_press(XB1_VIEW)) {
-            rapid_fire = !rapid_fire;
-            combo_run(Rumble_Alert);
-        }
-        if (event_press(XB1_MENU)) {
-            anti_recoil = !anti_recoil;
-            combo_run(Rumble_Alert);
-        }
-        if (event_press(XB1_X)) {
-            slide_cancel = !slide_cancel;
-            combo_run(Rumble_Alert);
-        }
-        if (event_press(XB1_A)) {
-            drop_shot = !drop_shot;
-            combo_run(Rumble_Alert);
-        }
-        if (event_press(XB1_B)) {
-            auto_sprint = !auto_sprint;
-            combo_run(Rumble_Alert);
-        }
-        if (event_press(XB1_Y)) {
-            hair_triggers = !hair_triggers;
-            combo_run(Rumble_Alert);
-        }
-        if (event_press(XB1_UP)) {
-            strafe_shot = !strafe_shot;
-            combo_run(Rumble_Alert);
-        }
-    }
+    // --- PURE D-PAD TOGGLES ---
+    if (event_press(XB1_UP) && !get_val(XB1_DOWN) && !get_val(XB1_LEFT) && !get_val(XB1_RIGHT)) { rapid_fire = !rapid_fire; combo_run(Rumble_Alert); }
+    if (event_press(XB1_DOWN) && !get_val(XB1_UP) && !get_val(XB1_LEFT) && !get_val(XB1_RIGHT)) { anti_recoil = !anti_recoil; combo_run(Rumble_Alert); }
+    if (event_press(XB1_LEFT) && !get_val(XB1_UP) && !get_val(XB1_DOWN) && !get_val(XB1_RIGHT)) { slide_cancel = !slide_cancel; combo_run(Rumble_Alert); }
+    if (event_press(XB1_RIGHT) && !get_val(XB1_UP) && !get_val(XB1_DOWN) && !get_val(XB1_LEFT)) { drop_shot = !drop_shot; combo_run(Rumble_Alert); }
+    
+    // Combined D-Pad Toggles
+    if (get_val(XB1_UP) && event_press(XB1_DOWN)) { auto_sprint = !auto_sprint; combo_run(Rumble_Alert); }
+    if (get_val(XB1_UP) && event_press(XB1_LEFT)) { hair_triggers = !hair_triggers; combo_run(Rumble_Alert); }
+    if (get_val(XB1_UP) && event_press(XB1_RIGHT)) { bunny_hop = !bunny_hop; combo_run(Rumble_Alert); }
+    if (get_val(XB1_DOWN) && event_press(XB1_LEFT)) { crouch_spam = !crouch_spam; combo_run(Rumble_Alert); }
+    if (get_val(XB1_DOWN) && event_press(XB1_RIGHT)) { quick_scope = !quick_scope; combo_run(Rumble_Alert); }
+    if (get_val(XB1_LEFT) && event_press(XB1_RIGHT)) { fast_melee = !fast_melee; combo_run(Rumble_Alert); }
+    
+    // Triple D-Pad Toggles
+    if (get_val(XB1_UP) && get_val(XB1_DOWN) && event_press(XB1_LEFT)) { hold_breath = !hold_breath; combo_run(Rumble_Alert); }
+    if (get_val(XB1_UP) && get_val(XB1_DOWN) && event_press(XB1_RIGHT)) { auto_ping = !auto_ping; combo_run(Rumble_Alert); }
+    if (get_val(XB1_UP) && get_val(XB1_LEFT) && event_press(XB1_RIGHT)) { fast_reload = !fast_reload; combo_run(Rumble_Alert); }
+    if (get_val(XB1_DOWN) && get_val(XB1_LEFT) && event_press(XB1_RIGHT)) { safe_drop = !safe_drop; combo_run(Rumble_Alert); }
 
-    // --- RAPID FIRE MODULE ---
-    if (rapid_fire && get_val(XB1_RT)) {
-        combo_run(RapidFire_Seq);
-    }
-
-    // --- ANTI-RECOIL MODULE (Locks Crosshairs Down) ---
-    if (anti_recoil && get_val(XB1_RT)) {
-        set_val(XB1_RY, get_val(XB1_RY) + recoil_strength);
-    }
-
-    // --- SLIDE CANCEL MODULE (Automatically resets slide momentum) ---
-    if (slide_cancel && get_val(XB1_B)) {
-        combo_run(SlideCancel_Seq);
-    }
-
-    // --- DROP SHOT MODULE ---
-    if (drop_shot && event_press(XB1_RT)) {
-        combo_run(DropShot_Seq);
-    }
-
-    // --- AUTO SPRINT MODULE ---
-    if (auto_sprint && get_val(XB1_LY) < -80) {
-        set_val(XB1_LS, 100);
-    }
-
-    // --- HAIR TRIGGERS MODULE (Instantly registers pull) ---
+    // --- MOD MODULES ---
+    if (rapid_fire && get_val(XB1_RT)) { combo_run(RapidFire_Seq); }
+    if (anti_recoil && get_val(XB1_RT)) { set_val(XB1_RY, get_val(XB1_RY) + recoil_strength); }
+    if (slide_cancel && get_val(XB1_B)) { combo_run(SlideCancel_Seq); }
+    if (drop_shot && event_press(XB1_RT)) { combo_run(DropShot_Seq); }
+    if (auto_sprint && get_val(XB1_LY) < -80) { set_val(XB1_LS, 100); }
     if (hair_triggers) {
         if (get_val(XB1_LT) > 10) set_val(XB1_LT, 100);
         if (get_val(XB1_RT) > 10) set_val(XB1_RT, 100);
     }
-
-    // --- STRAFE SHOT MODULE (Automatic micro-strafing while firing) ---
-    if (strafe_shot && get_val(XB1_RT)) {
-        combo_run(Strafe_Seq);
-    }
+    if (bunny_hop && get_val(XB1_A)) { combo_run(BunnyHop_Seq); }
+    if (crouch_spam && get_val(XB1_RT)) { combo_run(CrouchSpam_Seq); }
+    if (quick_scope && event_press(XB1_LT)) { combo_run(QuickScope_Seq); }
+    if (fast_melee && get_val(XB1_RS)) { combo_run(FastMelee_Seq); }
+    if (hold_breath && get_val(XB1_LT)) { set_val(XB1_LS, 100); }
+    if (auto_ping && get_val(XB1_LT)) { set_val(XB1_UP, 100); } 
+    if (fast_reload && event_press(XB1_X)) { combo_run(FastReload_Seq); }
+    if (safe_drop && get_val(XB1_A)) { combo_run(SafeDrop_Seq); }
 }
 
-// Rapid Fire Loop
-combo RapidFire_Seq {
-    set_val(XB1_RT, 100);
-    wait(fire_delay);
-    set_val(XB1_RT, 0);
-    wait(fire_delay);
-}
-
-// CoD Slide Cancel Sequence
-combo SlideCancel_Seq {
-    set_val(XB1_B, 100);
-    wait(60);
-    set_val(XB1_B, 0);
-    wait(50);
-    set_val(XB1_B, 100);
-    wait(60);
-    set_val(XB1_B, 0);
-    wait(50);
-    set_val(XB1_A, 100);
-    wait(60);
-    set_val(XB1_A, 0);
-}
-
-// Drop Shot Sequence
-combo DropShot_Seq {
-    set_val(XB1_B, 100);
-    wait(50);
-    set_val(XB1_B, 0);
-    wait(200);
-}
-
-// Micro-Strafe Loop
-combo Strafe_Seq {
-    set_val(XB1_LX, 100);
-    wait(150);
-    set_val(XB1_LX, -100);
-    wait(150);
-}
-
-// Rumble Feedback Notification
-combo Rumble_Alert {
-    set_rumble(RUMBLE_A, 70);
-    wait(150);
-    set_rumble(RUMBLE_A, 0);
-}
+// --- COMBOS ---
+combo RapidFire_Seq { set_val(XB1_RT, 100); wait(fire_delay); set_val(XB1_RT, 0); wait(fire_delay); }
+combo SlideCancel_Seq { set_val(XB1_B, 100); wait(60); set_val(XB1_B, 0); wait(50); set_val(XB1_B, 100); wait(60); set_val(XB1_B, 0); wait(50); set_val(XB1_A, 100); wait(60); set_val(XB1_A, 0); }
+combo DropShot_Seq { set_val(XB1_B, 100); wait(50); set_val(XB1_B, 0); wait(200); }
+combo BunnyHop_Seq { set_val(XB1_A, 100); wait(80); set_val(XB1_A, 0); wait(100); }
+combo CrouchSpam_Seq { set_val(XB1_B, 100); wait(40); set_val(XB1_B, 0); wait(60); }
+combo QuickScope_Seq { set_val(XB1_LT, 100); wait(180); set_val(XB1_RT, 100); wait(50); }
+combo FastMelee_Seq { set_val(XB1_RS, 100); wait(30); set_val(XB1_RS, 0); wait(40); }
+combo FastReload_Seq { set_val(XB1_X, 100); wait(40); set_val(XB1_X, 0); wait(30); }
+combo SafeDrop_Seq { set_val(XB1_A, 100); wait(30); set_val(XB1_A, 0); wait(30); }
+combo Rumble_Alert { set_rumble(RUMBLE_A, 70); wait(150); set_rumble(RUMBLE_A, 0); }
