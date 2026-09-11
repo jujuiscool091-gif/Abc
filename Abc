@@ -1,0 +1,74 @@
+// ==========================================
+// ADVANCED TITAN ONE SCRIPT 
+// ==========================================
+// Toggles (Hold L2 / LT to access menu modifiers):
+// - L2 + OPTIONS  : Toggle Rapid Fire (LED: Blue)
+// - L2 + SHARE    : Toggle Anti-Recoil (LED: Green)
+// - L2 + CROSS/A  : Toggle Drop Shot (LED: Red)
+// ==========================================
+
+int rapid_fire    = FALSE;
+int anti_recoil   = FALSE;
+int drop_shot     = FALSE;
+
+// Adjustable Parameters
+int recoil_power  = 32;   // Vertical pull-down strength (adjust 1 to 100)
+int rapid_delay   = 35;   // Milliseconds between shots
+
+main {
+    // --- MENU TOGGLES VIA CONTROLLER ---
+    if (get_val(PS4_L2)) {
+        if (event_press(PS4_OPTIONS)) {
+            rapid_fire = !rapid_fire;
+            if(rapid_fire) set_led(LED_BLUE); else set_led(LED_OFF);
+        }
+        if (event_press(PS4_SHARE)) {
+            anti_recoil = !anti_recoil;
+            if(anti_recoil) set_led(LED_GREEN); else set_led(LED_OFF);
+        }
+        if (event_press(PS4_CROSS)) {
+            drop_shot = !drop_shot;
+            if(drop_shot) set_led(LED_RED); else set_led(LED_OFF);
+        }
+    }
+
+    // --- RAPID FIRE MODULE ---
+    if (rapid_fire && get_val(PS4_R2)) {
+        combo_run(RapidFire_Mod);
+    }
+
+    // --- ANTI-RECOIL MODULE ---
+    if (anti_recoil && get_val(PS4_R2)) {
+        // Automatically pulls down the right analog stick when firing
+        set_val(PS4_RY, clamp(get_val(PS4_RY) + recoil_power, -100, 100));
+    }
+
+    // --- DROP SHOT MODULE ---
+    if (drop_shot && event_press(PS4_R2)) {
+        combo_run(DropShot_Mod);
+    }
+}
+
+// Rapid Fire Combo Loop
+combo RapidFire_Mod {
+    set_val(PS4_R2, 100);
+    wait(rapid_delay);
+    set_val(PS4_R2, 0);
+    wait(rapid_delay);
+}
+
+// Drop Shot Combo Loop (Drops to stance while firing)
+combo DropShot_Mod {
+    set_val(PS4_CIRCLE, 100); // Crouch / Prone input
+    wait(80);
+    set_val(PS4_CIRCLE, 0);
+    wait(300);
+}
+
+// LED Status Indicator Function
+function set_led(color) {
+    col_unset();
+    if(color == LED_BLUE)   set_led(LED_1, 1);
+    if(color == LED_GREEN)  set_led(LED_2, 1);
+    if(color == LED_RED)    set_led(LED_3, 1);
+}
