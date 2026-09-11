@@ -1,21 +1,21 @@
 // ==========================================
-// ULTIMATE TITAN ONE ADVANCED SCRIPT (XBOX SERIES X)
+// MAX-CONTROL ULTIMATE SCRIPT (XBOX SERIES X)
 // ==========================================
-// Menu Modifiers (Hold Left Bumper / LB to access):
+// Menu Modifiers (Hold Left Bumper / LB):
 // - LB + VIEW     : Toggle Rapid Fire
-// - LB + MENU     : Toggle Anti-Recoil
+// - LB + MENU     : Toggle Anti-Recoil (Zero Rise)
 // - LB + A        : Toggle Drop-Shot
 // - LB + B        : Toggle Auto-Sprint
 // ==========================================
 
-int rapid_fire    = FALSE;
-int anti_recoil   = FALSE;
+int rapid_fire    = TRUE;   // Default ON for maximum auto fire
+int anti_recoil   = TRUE;   // Default ON to lock crosshairs
 int drop_shot     = FALSE;
-int auto_sprint   = FALSE;
+int auto_sprint   = TRUE;   // Default ON for fluid movement
 
-// Custom Tuning Values
-int recoil_strength = 32; // Adjust vertical compensation strength (1-100)
-int fire_delay      = 30; // Milliseconds between rapid shots
+// Maximum Tuning Parameters (Adjust higher if heavy guns still pull up)
+int recoil_strength = 58;   // Aggressive downward pull to completely stop vertical climb
+int fire_delay      = 22;   // Ultra-fast milliseconds delay between rapid shots
 
 main {
     // --- MENU TOGGLE COMBOS (Hold LB / L1) ---
@@ -34,13 +34,14 @@ main {
         }
     }
 
-    // --- RAPID FIRE MODULE ---
+    // --- MAXIMUM RAPID FIRE MODULE ---
     if (rapid_fire && get_val(XB1_RT)) {
-        combo_run(RapidFire_Seq);
+        combo_run(RapidFire_Fast);
     }
 
-    // --- ANTI-RECOIL MODULE ---
+    // --- ZERO-RISE ANTI-RECOIL MODULE ---
     if (anti_recoil && get_val(XB1_RT)) {
+        // Automatically applies heavy downward compensation only when firing
         set_val(XB1_RY, get_val(XB1_RY) + recoil_strength);
     }
 
@@ -55,8 +56,8 @@ main {
     }
 }
 
-// Rapid Fire Loop
-combo RapidFire_Seq {
+// Ultra-Fast Rapid Fire Loop
+combo RapidFire_Fast {
     set_val(XB1_RT, 100);
     wait(fire_delay);
     set_val(XB1_RT, 0);
@@ -66,7 +67,7 @@ combo RapidFire_Seq {
 // Drop Shot Loop
 combo DropShot_Seq {
     set_val(XB1_B, 100);
-    wait(60);
+    wait(50);
     set_val(XB1_B, 0);
-    wait(250);
+    wait(200);
 }
