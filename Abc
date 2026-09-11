@@ -1,48 +1,74 @@
 // ==========================================
-// MAX-CONTROL ULTIMATE SCRIPT (XBOX SERIES X)
+// CALL OF DUTY - MEGA-MOD ULTIMATE SCRIPT (XBOX SERIES X)
 // ==========================================
-// Menu Modifiers (Hold Left Bumper / LB):
+// Menu Control (Hold Left Bumper / LB to modify):
 // - LB + VIEW     : Toggle Rapid Fire
-// - LB + MENU     : Toggle Anti-Recoil (Zero Rise)
+// - LB + MENU     : Toggle Anti-Recoil (Zero Vertical Rise)
+// - LB + X        : Toggle Slide-Cancel (CoD Movement)
 // - LB + A        : Toggle Drop-Shot
-// - LB + B        : Toggle Auto-Sprint
+// - LB + B        : Toggle Auto-Sprint / Tactical Sprint
+// - LB + Y        : Toggle Hair Triggers (Instant Response)
+// - LB + UP       : Toggle Strafe-Shot (Jitter/Strafing)
 // ==========================================
 
-int rapid_fire    = TRUE;   // Default ON for maximum auto fire
-int anti_recoil   = TRUE;   // Default ON to lock crosshairs
-int drop_shot     = FALSE;
-int auto_sprint   = TRUE;   // Default ON for fluid movement
+int rapid_fire    = FALSE; 
+int anti_recoil   = TRUE;  
+int slide_cancel  = TRUE;  
+int drop_shot     = FALSE; 
+int auto_sprint   = TRUE;  
+int hair_triggers = TRUE;  
+int strafe_shot   = FALSE; 
 
-// Maximum Tuning Parameters (Adjust higher if heavy guns still pull up)
-int recoil_strength = 58;   // Aggressive downward pull to completely stop vertical climb
-int fire_delay      = 22;   // Ultra-fast milliseconds delay between rapid shots
+// Advanced Tuning Parameters
+int recoil_strength = 50;  // Heavy vertical compensation strength
+int fire_delay      = 22;  // Milliseconds between rapid shots
 
 main {
-    // --- MENU TOGGLE COMBOS (Hold LB / L1) ---
+    // --- LIVE MENU TOGGLES (Hold LB / L1) ---
     if (get_val(XB1_LB)) {
         if (event_press(XB1_VIEW)) {
             rapid_fire = !rapid_fire;
+            combo_run(Rumble_Alert);
         }
         if (event_press(XB1_MENU)) {
             anti_recoil = !anti_recoil;
+            combo_run(Rumble_Alert);
+        }
+        if (event_press(XB1_X)) {
+            slide_cancel = !slide_cancel;
+            combo_run(Rumble_Alert);
         }
         if (event_press(XB1_A)) {
             drop_shot = !drop_shot;
+            combo_run(Rumble_Alert);
         }
         if (event_press(XB1_B)) {
             auto_sprint = !auto_sprint;
+            combo_run(Rumble_Alert);
+        }
+        if (event_press(XB1_Y)) {
+            hair_triggers = !hair_triggers;
+            combo_run(Rumble_Alert);
+        }
+        if (event_press(XB1_UP)) {
+            strafe_shot = !strafe_shot;
+            combo_run(Rumble_Alert);
         }
     }
 
-    // --- MAXIMUM RAPID FIRE MODULE ---
+    // --- RAPID FIRE MODULE ---
     if (rapid_fire && get_val(XB1_RT)) {
-        combo_run(RapidFire_Fast);
+        combo_run(RapidFire_Seq);
     }
 
-    // --- ZERO-RISE ANTI-RECOIL MODULE ---
+    // --- ANTI-RECOIL MODULE (Locks Crosshairs Down) ---
     if (anti_recoil && get_val(XB1_RT)) {
-        // Automatically applies heavy downward compensation only when firing
         set_val(XB1_RY, get_val(XB1_RY) + recoil_strength);
+    }
+
+    // --- SLIDE CANCEL MODULE (Automatically resets slide momentum) ---
+    if (slide_cancel && get_val(XB1_B)) {
+        combo_run(SlideCancel_Seq);
     }
 
     // --- DROP SHOT MODULE ---
@@ -54,20 +80,61 @@ main {
     if (auto_sprint && get_val(XB1_LY) < -80) {
         set_val(XB1_LS, 100);
     }
+
+    // --- HAIR TRIGGERS MODULE (Instantly registers pull) ---
+    if (hair_triggers) {
+        if (get_val(XB1_LT) > 10) set_val(XB1_LT, 100);
+        if (get_val(XB1_RT) > 10) set_val(XB1_RT, 100);
+    }
+
+    // --- STRAFE SHOT MODULE (Automatic micro-strafing while firing) ---
+    if (strafe_shot && get_val(XB1_RT)) {
+        combo_run(Strafe_Seq);
+    }
 }
 
-// Ultra-Fast Rapid Fire Loop
-combo RapidFire_Fast {
+// Rapid Fire Loop
+combo RapidFire_Seq {
     set_val(XB1_RT, 100);
     wait(fire_delay);
     set_val(XB1_RT, 0);
     wait(fire_delay);
 }
 
-// Drop Shot Loop
+// CoD Slide Cancel Sequence
+combo SlideCancel_Seq {
+    set_val(XB1_B, 100);
+    wait(60);
+    set_val(XB1_B, 0);
+    wait(50);
+    set_val(XB1_B, 100);
+    wait(60);
+    set_val(XB1_B, 0);
+    wait(50);
+    set_val(XB1_A, 100);
+    wait(60);
+    set_val(XB1_A, 0);
+}
+
+// Drop Shot Sequence
 combo DropShot_Seq {
     set_val(XB1_B, 100);
     wait(50);
     set_val(XB1_B, 0);
     wait(200);
+}
+
+// Micro-Strafe Loop
+combo Strafe_Seq {
+    set_val(XB1_LX, 100);
+    wait(150);
+    set_val(XB1_LX, -100);
+    wait(150);
+}
+
+// Rumble Feedback Notification
+combo Rumble_Alert {
+    set_rumble(RUMBLE_A, 70);
+    wait(150);
+    set_rumble(RUMBLE_A, 0);
 }
