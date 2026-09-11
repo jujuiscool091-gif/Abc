@@ -1,74 +1,73 @@
 // ==========================================
-// ADVANCED TITAN ONE SCRIPT 
+// ULTIMATE TITAN ONE ADVANCED SCRIPT (XBOX SERIES X)
 // ==========================================
-// Toggles (Hold L2 / LT to access menu modifiers):
-// - L2 + OPTIONS  : Toggle Rapid Fire (LED: Blue)
-// - L2 + SHARE    : Toggle Anti-Recoil (LED: Green)
-// - L2 + CROSS/A  : Toggle Drop Shot (LED: Red)
+// Menu Modifiers (Hold Left Bumper / LB to access):
+// - LB + XBOX/VIEW : Toggle Rapid Fire
+// - LB + MENU      : Toggle Anti-Recoil
+// - LB + A         : Toggle Drop-Shot
+// - LB + B         : Toggle Auto-Sprint
 // ==========================================
 
 int rapid_fire    = FALSE;
 int anti_recoil   = FALSE;
 int drop_shot     = FALSE;
+int auto_sprint   = FALSE;
 
-// Adjustable Parameters
-int recoil_power  = 32;   // Vertical pull-down strength (adjust 1 to 100)
-int rapid_delay   = 35;   // Milliseconds between shots
+// Custom Tuning Values
+int recoil_strength = 32; // Adjust vertical compensation strength (1-100)
+int fire_delay      = 30; // Milliseconds between rapid shots
 
 main {
-    // --- MENU TOGGLES VIA CONTROLLER ---
-    if (get_val(PS4_L2)) {
-        if (event_press(PS4_OPTIONS)) {
+    // --- MENU TOGGLE COMBOS (Hold LB / L1) ---
+    if (get_val(XB1_LB)) {
+        if (event_press(XB1_VIEW)) {
             rapid_fire = !rapid_fire;
-            if(rapid_fire) set_led(LED_BLUE); else set_led(LED_OFF);
         }
-        if (event_press(PS4_SHARE)) {
+        if (event_press(XB1_MENU)) {
             anti_recoil = !anti_recoil;
-            if(anti_recoil) set_led(LED_GREEN); else set_led(LED_OFF);
         }
-        if (event_press(PS4_CROSS)) {
+        if (event_press(XB1_A)) {
             drop_shot = !drop_shot;
-            if(drop_shot) set_led(LED_RED); else set_led(LED_OFF);
+        }
+        if (event_press(XB1_B)) {
+            auto_sprint = !auto_sprint;
         }
     }
 
     // --- RAPID FIRE MODULE ---
-    if (rapid_fire && get_val(PS4_R2)) {
-        combo_run(RapidFire_Mod);
+    if (rapid_fire && get_val(XB1_RT)) {
+        combo_run(RapidFire_Seq);
     }
 
     // --- ANTI-RECOIL MODULE ---
-    if (anti_recoil && get_val(PS4_R2)) {
-        // Automatically pulls down the right analog stick when firing
-        set_val(PS4_RY, clamp(get_val(PS4_RY) + recoil_power, -100, 100));
+    if (anti_recoil && get_val(XB1_RT)) {
+        // Compensates for weapon kick by pushing down the right stick
+        set_val(XB1_RY, clamp(get_val(XB1_RY) + recoil_strength, -100, 100));
     }
 
     // --- DROP SHOT MODULE ---
-    if (drop_shot && event_press(PS4_R2)) {
-        combo_run(DropShot_Mod);
+    if (drop_shot && event_press(XB1_RT)) {
+        combo_run(DropShot_Seq);
+    }
+
+    // --- AUTO SPRINT MODULE ---
+    if (auto_sprint && get_val(XB1_LY) < -80) {
+        set_val(XB1_LS, 100);
     }
 }
 
-// Rapid Fire Combo Loop
-combo RapidFire_Mod {
-    set_val(PS4_R2, 100);
-    wait(rapid_delay);
-    set_val(PS4_R2, 0);
-    wait(rapid_delay);
+// Rapid Fire Loop
+combo RapidFire_Seq {
+    set_val(XB1_RT, 100);
+    wait(fire_delay);
+    set_val(XB1_RT, 0);
+    wait(fire_delay);
 }
 
-// Drop Shot Combo Loop (Drops to stance while firing)
-combo DropShot_Mod {
-    set_val(PS4_CIRCLE, 100); // Crouch / Prone input
-    wait(80);
-    set_val(PS4_CIRCLE, 0);
-    wait(300);
-}
-
-// LED Status Indicator Function
-function set_led(color) {
-    col_unset();
-    if(color == LED_BLUE)   set_led(LED_1, 1);
-    if(color == LED_GREEN)  set_led(LED_2, 1);
-    if(color == LED_RED)    set_led(LED_3, 1);
+// Drop Shot Loop (Drops to prone/crouch instantly on fire)
+combo DropShot_Seq {
+    set_val(XB1_B, 100);
+    wait(60);
+    set_val(XB1_B, 0);
+    wait(250);
 }
